@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PolyWhale</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="header-left">
+                    <h1 class="app-title">🐋 PolyWhale</h1>
+                    <div class="limit-selector">
+                        <label for="tx-limit">Show:</label>
+                        <select id="tx-limit" class="limit-dropdown">
+                            <option value="10" selected>10 latest</option>
+                            <option value="20">20 latest</option>
+                            <option value="30">30 latest</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+                        <span class="theme-icon">🌙</span>
+                    </button>
+                    <div class="status-indicator">
+                        <span class="status-dot"></span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div id="transactions-container" class="transactions-container">
+                <!-- Loading state -->
+                <div id="loading" class="loading-state">
+                    <div class="spinner"></div>
+                    <p>Loading whale transactions...</p>
+                </div>
+
+                <!-- Empty state -->
+                <div id="empty-state" class="empty-state" style="display: none;">
+                    <p class="empty-icon">🐋</p>
+                    <p class="empty-text">No whale transactions yet</p>
+                    <p class="empty-subtext">We're monitoring for trades over $10,000</p>
+                </div>
+
+                <!-- Transactions will be inserted here -->
+                <div id="transactions-list" class="transactions-list" style="display: none;">
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <button id="refresh-btn" class="refresh-btn">
+                <span class="refresh-icon">🔄</span>
+                Refresh
+            </button>
+            <div class="last-update">
+                Last updated: <span id="last-update-time">Never</span>
+            </div>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>

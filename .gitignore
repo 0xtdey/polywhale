@@ -1,0 +1,83 @@
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+
+# Electron
+dist/
+out/
+build/release/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv/
+*.egg-info/
+.pytest_cache/
+
+# Database
+*.db
+*.db-journal
+*.db.backup
+whale_trades.db
+whale_trades.db.backup
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Build artifacts
+*.AppImage
+*.deb
+*.rpm
+*.dmg
+*.exe
+*.zip
+*.tar.gz
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# GitHub token (security)
+.github-token
+GH_TOKEN
+
+# Electron builder
+.electron-builder.yml
+builder-debug.yml
+builder-effective-config.yaml
+
+readme.md
+DISTRIBUTION_QUICK.md
+DISTRIBUTION.md
