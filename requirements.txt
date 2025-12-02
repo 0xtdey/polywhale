@@ -1,4 +1,6 @@
 requests>=2.31.0
+flask>=2.3.0
+flask-cors>=4.0.0
 PyQt5>=5.15.10
 notify2>=0.3.1
 apscheduler>=3.10.4

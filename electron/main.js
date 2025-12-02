@@ -2,10 +2,31 @@ const { app, BrowserWindow, ipcMain, Tray, Menu, nativeImage, dialog } = require
 const path = require('path');
 const { spawn } = require('child_process');
 const { autoUpdater } = require('electron-updater');
+const fs = require('fs');
 
 let mainWindow;
 let tray;
 let pythonProcess;
+
+// Get icon path with fallback
+function getIconPath() {
+    const possiblePaths = [
+        app.isPackaged ? path.join(process.resourcesPath, 'icon.png') : null,
+        app.isPackaged ? path.join(process.resourcesPath, '../icon.png') : null,
+        path.join(__dirname, '../build/icon.png'),
+        '/usr/share/pixmaps/polywhale.png'
+    ].filter(Boolean);
+
+    for (const iconPath of possiblePaths) {
+        if (fs.existsSync(iconPath)) {
+            console.log('Using icon:', iconPath);
+            return iconPath;
+        }
+    }
+
+    console.warn('No icon file found, using default');
+    return null;  // Will use default icon
+}
 
 // Configure auto-updater
 autoUpdater.autoDownload = false; // Don't auto-download, ask user first
@@ -57,7 +78,8 @@ function createWindow() {
         },
         backgroundColor: '#1a1a1a',
         titleBarStyle: 'default',
-        icon: path.join(__dirname, '../build/icon.png')
+        icon: getIconPath(),
+        show: true  // Show window immediately
     });
 
     mainWindow.loadFile(path.join(__dirname, 'renderer', 'index.html'));
@@ -73,9 +95,9 @@ function createWindow() {
 }
 
 // Create system tray
+// Create system tray
 function createTray() {
-    // Create a simple icon (you can replace with actual icon file)
-    const iconPath = path.join(__dirname, '../build/icon.png');
+    const iconPath = getIconPath();
 
     tray = new Tray(iconPath);
 

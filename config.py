@@ -19,7 +19,10 @@ INITIAL_FETCH_HOURS = 24  # Try to fetch from last 24 hours on first run
 FALLBACK_FETCH_DAYS = 7  # If no trades in 24hrs, fallback to 7 days
 
 # Database settings
-DB_PATH = os.path.join(os.path.dirname(__file__), "whale_trades.db")
+# Use user's data directory for database storage
+DATA_DIR = os.path.join(os.path.expanduser("~"), ".local", "share", "polywhale")
+os.makedirs(DATA_DIR, exist_ok=True)  # Create directory structure if it doesn't exist
+DB_PATH = os.path.join(DATA_DIR, "whale_trades.db")
 
 # Notification settings
 NOTIFICATION_TIMEOUT = 5000  # 5 seconds
