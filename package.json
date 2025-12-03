@@ -30,8 +30,8 @@
     "electron-updater": "^6.6.2"
   },
   "devDependencies": {
-    "electron": "^28.0.0",
-    "electron-builder": "^24.9.1"
+    "electron": "^31.0.0",
+    "electron-builder": "^26.0.12"
   },
   "build": {
     "appId": "com.polymarket.polywhale",
@@ -47,13 +47,7 @@
         "AppImage"
       ],
       "category": "Network",
-      "icon": "build/icon.png",
-      "desktop": {
-        "Name": "PolyWhale",
-        "Comment": "Monitor Polymarket whale transactions",
-        "Categories": "Network;Finance;",
-        "Terminal": "false"
-      }
+      "icon": "build/icon.png"
     },
     "deb": {
       "depends": [
@@ -70,18 +64,29 @@
       "polymarket_api.py",
       "notifier_service.py",
       "backend_server.py",
+      "check-dependencies.py",
       "requirements.txt",
       "package.json"
     ],
+    "asarUnpack": [
+      "**/*.py"
+    ],
     "extraResources": [
+      {
+        "from": "dist/backend_server",
+        "to": "backend_server"
+      },
       {
         "from": ".",
         "to": ".",
         "filter": [
-          "*.py",
-          "requirements.txt",
-          "config.py"
+          "config.py",
+          "requirements.txt"
         ]
+      },
+      {
+        "from": "build/icon.png",
+        "to": "icon.png"
       }
     ]
   }

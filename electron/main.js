@@ -1,4 +1,7 @@
 const { app, BrowserWindow, ipcMain, Tray, Menu, nativeImage, dialog } = require('electron');
+
+// Disable sandbox to fix Linux SUID permission errors
+// app.commandLine.appendSwitch('no-sandbox');
 const path = require('path');
 const { spawn } = require('child_process');
 const { autoUpdater } = require('electron-updater');
@@ -12,7 +15,7 @@ let pythonProcess;
 function getIconPath() {
     const possiblePaths = [
         app.isPackaged ? path.join(process.resourcesPath, 'icon.png') : null,
-        app.isPackaged ? path.join(process.resourcesPath, '../icon.png') : null,
+        app.isPackaged ? path.join(process.resourcesPath, 'app.asar.unpacked', 'icon.png') : null,
         path.join(__dirname, '../build/icon.png'),
         '/usr/share/pixmaps/polywhale.png'
     ].filter(Boolean);
@@ -25,7 +28,8 @@ function getIconPath() {
     }
 
     console.warn('No icon file found, using default');
-    return null;  // Will use default icon
+    // Return empty image to prevent crash, but log warning
+    return nativeImage.createEmpty(); 
 }
 
 // Configure auto-updater
@@ -34,32 +38,50 @@ autoUpdater.autoInstallOnAppQuit = true;
 
 // Start Python backend server
 function startPythonBackend() {
-    // Determine the correct path for the Python backend
     const isDev = !app.isPackaged;
-    const pythonScript = isDev
-        ? path.join(__dirname, '..', 'backend_server.py')
-        : path.join(process.resourcesPath, 'backend_server.py');
+    let backendExecutable;
+    let workingDir;
 
-    const workingDir = isDev
-        ? path.join(__dirname, '..')
-        : process.resourcesPath;
+    if (isDev) {
+        // In dev, use python script
+        backendExecutable = 'python3';
+        workingDir = path.join(__dirname, '..');
+        const pythonScript = path.join(__dirname, '..', 'backend_server.py');
 
-    console.log('Starting Python backend from:', pythonScript);
+        console.log('Starting Backend (Dev Mode)...');
+        pythonProcess = spawn('python3', [pythonScript], {
+            cwd: workingDir,
+            env: { ...process.env, PYTHONUNBUFFERED: '1', PYTHONPATH: workingDir }
+        });
+    } else {
+        // In production, use bundled binary
+        backendExecutable = path.join(process.resourcesPath, 'backend_server');
+        workingDir = process.resourcesPath;
 
-    pythonProcess = spawn('python3', [pythonScript], {
-        cwd: workingDir
-    });
+        console.log('Starting Backend (Production Mode)...');
+        console.log('Binary:', backendExecutable);
+
+        if (!fs.existsSync(backendExecutable)) {
+            dialog.showErrorBox('Error', 'Backend binary not found!');
+            return;
+        }
+
+        pythonProcess = spawn(backendExecutable, [], {
+            cwd: workingDir,
+            env: { ...process.env, PYTHONUNBUFFERED: '1' }
+        });
+    }
 
     pythonProcess.stdout.on('data', (data) => {
-        console.log(`Backend: ${data}`);
+        console.log(`[Backend] ${data}`);
     });
 
     pythonProcess.stderr.on('data', (data) => {
-        console.log(`Backend Log: ${data}`);
+        console.error(`[Backend Error] ${data}`);
     });
 
     pythonProcess.on('close', (code) => {
-        console.log(`Backend process exited with code ${code}`);
+        console.log(`Backend exited with code ${code}`);
     });
 }
 
@@ -97,9 +119,8 @@ function createWindow() {
 // Create system tray
 // Create system tray
 function createTray() {
-    const iconPath = getIconPath();
-
-    tray = new Tray(iconPath);
+    const icon = getIconPath();
+    tray = new Tray(icon);
 
     const contextMenu = Menu.buildFromTemplate([
         {

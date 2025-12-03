@@ -1,65 +1,41 @@
 #!/bin/bash
 # Post-installation script for PolyWhale
+# Handles system integration (symlinks, permissions)
 
 echo "========================================="
-echo "PolyWhale - Installing Python dependencies"
+echo "PolyWhale - Post-Installation Setup"
 echo "========================================="
 
-# Check if Python 3 is installed
-if ! command -v python3 &> /dev/null; then
-    echo "ERROR: python3 is not installed!"
-    echo "Please install Python 3 and try again."
-    exit 1
-fi
-
-echo "Python version: $(python3 --version)"
-
-# Install Python packages with different methods until one succeeds
-echo ""
-echo "Attempting to install Python packages..."
-
-PACKAGES="requests flask flask-cors apscheduler notify2 dbus-python"
-
-# Try method 1: pip3 with --user flag
-if pip3 install --user $PACKAGES 2>/dev/null; then
-    echo "✓ Successfully installed packages using pip3 --user"
-    INSTALL_SUCCESS=true
-# Try method 2: pip3 with --break-system-packages (for newer systems)
-elif pip3 install --break-system-packages $PACKAGES 2>/dev/null; then
-    echo "✓ Successfully installed packages using pip3 --break-system-packages"
-    INSTALL_SUCCESS=true
-# Try method 3: pip3 without flags (requires root/sudo)
-elif pip3 install $PACKAGES 2>/dev/null; then
-    echo "✓ Successfully installed packages using pip3"
-    INSTALL_SUCCESS=true
+# Determine if running as root
+if [ "$EUID" -eq 0 ]; then
+    IS_ROOT=true
 else
-    echo "⚠ WARNING: Automatic installation failed!"
-    echo ""
-    echo "Please manually install the required packages:"
-    echo "  pip3 install --user $PACKAGES"
-    echo ""
-    echo "Or if that fails, try:"
-    echo "  pip3 install --break-system-packages $PACKAGES"
-    INSTALL_SUCCESS=false
+    IS_ROOT=false
 fi
 
+# Fix chrome-sandbox permissions if it exists (fixes FATAL:setuid_sandbox_host.cc error)
+if [ "$IS_ROOT" = true ] && [ -f "/opt/PolyWhale/chrome-sandbox" ]; then
+    echo "Fixing chrome-sandbox permissions..."
+    chown root:root /opt/PolyWhale/chrome-sandbox
+    chmod 4755 /opt/PolyWhale/chrome-sandbox
+    echo "✓ Fixed chrome-sandbox permissions"
+fi
+
+# Create symbolic link if running as root (system installation)
+if [ "$IS_ROOT" = true ] && [ -f "/opt/PolyWhale/polywhale" ]; then
+    if [ ! -L "/usr/local/bin/polywhale" ]; then
+        ln -sf /opt/PolyWhale/polywhale /usr/local/bin/polywhale
+        echo "✓ Created command shortcut: polywhale"
+    fi
+fi
+
+# Create user data directory
+USER_DATA_DIR="$HOME/.local/share/polywhale"
+mkdir -p "$USER_DATA_DIR"
+echo "✓ Data directory ready: $USER_DATA_DIR"
+
 echo ""
+echo "✅ PolyWhale installed successfully!"
+echo "To launch: Run 'polywhale' or find it in your menu."
 echo "========================================="
-if [ "$INSTALL_SUCCESS" = true ]; then
-    echo "✓ PolyWhale installed successfully!"
-else
-    echo "⚠ PolyWhale installed with warnings"
-    echo "  You may need to install Python packages manually"
-fi
-echo "========================================="
-
-# Create symlink for easy command-line access
-if [ ! -L "/usr/bin/polywhale" ]; then
-    ln -sf /opt/PolyWhale/polywhale /usr/bin/polywhale
-    echo "✓ Created command shortcut: polywhale"
-fi
-
-echo ""
-echo "To launch: polywhale"
-echo "Or find 'PolyWhale' in your Applications menu"
-echo ""
+exit 0

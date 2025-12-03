@@ -12,12 +12,12 @@ build/release/
 
 # Python
 __pycache__/
+venv/
 *.py[cod]
 *$py.class
 *.so
 .Python
 env/
-venv/
 ENV/
 .venv/
 *.egg-info/
@@ -78,6 +78,6 @@ GH_TOKEN
 builder-debug.yml
 builder-effective-config.yaml
 
-readme.md
-DISTRIBUTION_QUICK.md
-DISTRIBUTION.md
+# readme.md
+# DISTRIBUTION_QUICK.md
+# DISTRIBUTION.md
