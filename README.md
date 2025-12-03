@@ -1,4 +1,5 @@
 # 🐋 PolyWhale
+<img width="1970" height="512" alt="icon (1)" src="https://github.com/user-attachments/assets/9c15d514-94d0-42cd-8b65-c120e4e6f85f" />
 
 **Simple desktop app to monitor whale transactions on Polymarket.**
 
