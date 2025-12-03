@@ -1,66 +1,80 @@
-# PolyWhale
+# 🐋 PolyWhale
 
-Simple desktop app to monitor whale transactions on Polymarket.
+**Simple desktop app to monitor whale transactions on Polymarket.**
 
-## Quick Start
+PolyWhale sits quietly in your background and notifies you whenever a "whale" transaction (over $10,000) occurs on Polymarket. It features a clean, card-based UI to view transaction history and stays out of your way when you don't need it.
 
-**Just double-click to run:**
-```bash
-./start-app.sh
-```
+## ✨ Features
 
-That's it! The app will open automatically.
+- 🐋 **Real-time Monitoring**: Checks for trades over $10,000 every minute.
+- 🔔 **Desktop Notifications**: Get instant alerts for big moves.
+- 📊 **Clean UI**: Simple card-based feed, not a complex trading terminal.
+- 📅 **History**: View past whale transactions with dates in dd/mm/yyyy format.
+- 🚀 **Smart Display**: Choose to see the latest 10, 20, or 30 transactions.
+- 🔗 **Direct Links**: Click any card to view the market on Polymarket.
 
-## First Time Setup
+## 📥 Download & Install
 
-1. Make sure Python dependencies are installed:
+### For Debian/Ubuntu Users
+
+1. **Download the .deb package:**
+   - Get the latest `polywhale_x.x.x_amd64.deb` from the [Releases page](https://github.com/YOUR_USERNAME/polywhale/releases).
+
+2. **Install:**
+   ```bash
+   sudo dpkg -i polywhale_2.0.0_amd64.deb
+   ```
+
+3. **Fix dependencies (if needed):**
+   If you see any error messages about missing dependencies:
+   ```bash
+   sudo apt-get install -f
+   ```
+
+4. **Launch:**
+   - Find **PolyWhale** in your Applications menu.
+   - Or run from terminal: `polywhale`
+
+### For Developers (Run from Source)
+
+If you want to run the app from source code:
+
+1. **Install Python dependencies:**
    ```bash
    pip install requests PyQt5 notify2 apscheduler dbus-python flask flask-cors
    ```
 
-2. Run the app:
+2. **Run the app:**
    ```bash
    ./start-app.sh
    ```
 
-## What It Does
+## 🗑️ Uninstall
 
-- 🐋 Monitors Polymarket for trades over $10,000
-- 🔔 Shows desktop notifications for new whale trades
-- 📊 Clean card-based UI to view all transactions
-- 📅 Dates in dd/mm/yyyy format
-- ⏰ Auto-refreshes every minute
+To remove PolyWhale from your system:
 
-## UI
-
-Simple, clean card design - not a complex trading terminal:
-
-```
-🐋 PolyWhale         ● Running
-
-🐋 $86,668 SELL
-Jurassic World: Rebirth...
-01/12/2024 12:05
-
-🐋 $11,020 BUY  
-Portugal presidential...
-01/12/2024 12:04
+```bash
+sudo dpkg -r polywhale
 ```
 
-Click any card to see full details.
+## 🔧 Configuration
 
-## Troubleshooting
+*For source installations:*
+You can customize the application behavior by editing `config.py`:
+- **Whale Threshold**: Change the minimum amount for alerts (default: $10,000).
+- **Polling Interval**: Change how often it checks for new trades (default: 5 minutes).
+
+## ❓ Troubleshooting
 
 **App won't start?**
-- Make sure `start-app.sh` is executable: `chmod +x start-app.sh`
-- Install Python dependencies (see above)
+- Ensure you have Python 3.8+ installed.
+- If running from source, make sure `start-app.sh` is executable: `chmod +x start-app.sh`.
 
 **No transactions showing?**
-- Wait 30 seconds for backend to start
-- Backend runs on http://localhost:5000
+- The app waits about 30 seconds for the backend to initialize.
+- Ensure you have an active internet connection.
+- The backend runs on `http://localhost:5000`.
 
-## Configuration
+---
 
-Edit `config.py` to change:
-- Whale threshold (default: $10,000)
-- Polling interval (default: 5 minutes)
+*Educational/personal use only.*
