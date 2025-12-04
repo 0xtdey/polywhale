@@ -1,6 +1,6 @@
 {
   "name": "polywhale",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "PolyWhale - Desktop app for monitoring Polymarket whale transactions",
   "main": "electron/main.js",
   "homepage": "https://github.com/0xtdey/polywhale",

@@ -80,6 +80,69 @@ body {
     border-color: #4CAF50;
 }
 
+.threshold-control {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: #a0a0a0;
+}
+
+.threshold-control label {
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.threshold-input {
+    background: #2a2a2a;
+    color: #e0e0e0;
+    border: 1px solid #3d3d3d;
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 12px;
+    outline: none;
+    transition: all 0.2s;
+    width: 80px;
+}
+
+.threshold-input:hover {
+    border-color: #4CAF50;
+    background: #2d2d2d;
+}
+
+.threshold-input:focus {
+    border-color: #4CAF50;
+}
+
+.threshold-btn {
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 5px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.threshold-btn:hover {
+    background: #45a049;
+    transform: translateY(-1px);
+}
+
+.threshold-btn:active {
+    transform: translateY(0);
+}
+
+.threshold-btn:disabled {
+    background: #333;
+    color: #666;
+    cursor: not-allowed;
+    transform: none;
+}
+
 .header-right {
     display: flex;
     align-items: center;
@@ -488,6 +551,21 @@ body.light-theme .theme-toggle {
 body.light-theme .theme-toggle:hover {
     background: #f9f9f9;
     border-color: #4CAF50;
+}
+
+body.light-theme .threshold-control {
+    color: #666;
+}
+
+body.light-theme .threshold-input {
+    background: #ffffff;
+    color: #1a1a1a;
+    border: 1px solid #d0d0d0;
+}
+
+body.light-theme .threshold-input:hover {
+    border-color: #4CAF50;
+    background: #f9f9f9;
 }
 
 body.light-theme .status-indicator {

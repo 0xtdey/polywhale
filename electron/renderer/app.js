@@ -5,6 +5,7 @@ const API_BASE = 'http://localhost:5000/api';
 let transactions = [];
 let expandedCardId = null;
 let transactionLimit = 10; // Default to 10
+let currentThreshold = 10000; // Default threshold
 
 // Initialize app
 document.addEventListener('DOMContentLoaded', () => {
@@ -18,6 +19,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Load saved theme preference
     initializeTheme();
 
+    // Load initial data
+    loadThreshold();
     loadTransactions();
     setupEventListeners();
 
@@ -53,6 +56,9 @@ function setupEventListeners() {
     const themeToggle = document.getElementById('theme-toggle');
     themeToggle.addEventListener('click', toggleTheme);
 
+    // Whale threshold update button
+    const updateThresholdBtn = document.getElementById('update-threshold-btn');
+    updateThresholdBtn.addEventListener('click', updateThreshold);
 
     // Listen for tray menu refresh
     if (window.electronAPI) {
@@ -60,6 +66,95 @@ function setupEventListeners() {
             loadTransactions();
         });
     }
+}
+
+// Load whale threshold from API
+async function loadThreshold() {
+    try {
+        const response = await fetch(`${API_BASE}/threshold`);
+        const data = await response.json();
+
+        if (data.success) {
+            currentThreshold = data.threshold;
+            document.getElementById('whale-threshold').value = currentThreshold;
+            updateEmptyStateText();
+        }
+    } catch (error) {
+        console.error('Failed to load threshold:', error);
+    }
+}
+
+// Update whale threshold via API
+async function updateThreshold() {
+    const input = document.getElementById('whale-threshold');
+    const button = document.getElementById('update-threshold-btn');
+    const amount = parseFloat(input.value);
+
+    // Validate input
+    if (!amount || amount <= 0) {
+        showThresholdFeedback('Please enter a valid positive amount', false);
+        return;
+    }
+
+    // Disable button during update
+    button.disabled = true;
+    button.textContent = 'Updating...';
+
+    try {
+        const response = await fetch(`${API_BASE}/threshold`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ amount })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            currentThreshold = data.threshold;
+            updateEmptyStateText();
+            showThresholdFeedback(`Threshold updated to $${formatThreshold(currentThreshold)}`, true);
+        } else {
+            showThresholdFeedback(data.error || 'Failed to update threshold', false);
+        }
+    } catch (error) {
+        console.error('Failed to update threshold:', error);
+        showThresholdFeedback('Failed to update threshold', false);
+    } finally {
+        button.disabled = false;
+        button.textContent = 'Update';
+    }
+}
+
+// Show threshold update feedback
+function showThresholdFeedback(message, success) {
+    const button = document.getElementById('update-threshold-btn');
+    const originalText = button.textContent;
+    const originalBg = button.style.backgroundColor;
+
+    button.textContent = success ? '✓ ' + message : '✗ ' + message;
+    button.style.backgroundColor = success ? '#4CAF50' : '#f44336';
+    button.style.color = 'white';
+
+    setTimeout(() => {
+        button.textContent = originalText;
+        button.style.backgroundColor = originalBg;
+        button.style.color = '';
+    }, 3000);
+}
+
+// Update empty state text with current threshold
+function updateEmptyStateText() {
+    const emptyText = document.getElementById('empty-threshold-text');
+    if (emptyText) {
+        emptyText.textContent = `We're monitoring for trades over $${formatThreshold(currentThreshold)}`;
+    }
+}
+
+// Format threshold with commas
+function formatThreshold(amount) {
+    return new Intl.NumberFormat('en-US').format(amount);
 }
 
 // Load transactions from API

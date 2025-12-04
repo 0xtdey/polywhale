@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.1.0] - 2025-12-04
+
+### 🚀 New Features
+- **Configurable Whale Threshold:** Users can now customize the whale transaction amount directly from the UI (default: $10,000).
+- **Persistent Settings:** Threshold preference is saved and persists across app restarts.
+
+### 🔧 Improvements
+- Enhanced database thread safety for better multi-threaded performance.
+- Improved API response handling and error messages.
+
 ## [2.0.0] - 2025-12-03
 
 ### 🚀 New Features

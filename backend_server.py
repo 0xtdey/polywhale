@@ -82,6 +82,66 @@ def trigger_refresh():
             'error': str(e)
         }), 500
 
+@app.route('/api/threshold', methods=['GET'])
+def get_threshold():
+    """Get current whale threshold."""
+    try:
+        threshold = db.get_whale_threshold()
+        return jsonify({
+            'success': True,
+            'threshold': threshold
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/api/threshold', methods=['POST'])
+def update_threshold():
+    """Update whale threshold."""
+    try:
+        data = request.get_json()
+        amount = data.get('amount')
+        
+        if amount is None:
+            return jsonify({
+                'success': False,
+                'error': 'Amount is required'
+            }), 400
+            
+        # Validate amount
+        try:
+            amount = float(amount)
+            if amount <= 0:
+                raise ValueError("Amount must be positive")
+        except (ValueError, TypeError) as e:
+            return jsonify({
+                'success': False,
+                'error': 'Invalid amount: must be a positive number'
+            }), 400
+        
+        # Update threshold in database
+        db.set_whale_threshold(amount)
+        
+        # Update notifier service if running
+        if notifier:
+            notifier.update_threshold(amount)
+        
+        return jsonify({
+            'success': True,
+            'threshold': amount,
+            'message': 'Threshold updated successfully'
+        })
+    except Exception as e:
+        import traceback
+        print(f"ERROR in /api/threshold POST: {str(e)}")
+        print(traceback.format_exc())
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
 def start_notifier_service():
     """Start the background notifier service."""
     global notifier

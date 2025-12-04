@@ -2,11 +2,12 @@
 
 **Simple desktop app to monitor whale transactions on Polymarket.**
 
-PolyWhale sits quietly in your background and notifies you whenever a "whale" transaction (over $10,000) occurs on Polymarket. It features a clean, card-based UI to view transaction history and stays out of your way when you don't need it.
+PolyWhale sits quietly in your background and notifies you whenever a "whale" transaction occurs on Polymarket. Choose your own threshold amount (default: $10,000) and get instant notifications when big trades happen.
 
 ## ✨ Features
 
-- 🐋 **Real-time Monitoring**: Checks for trades over $10,000 every minute.
+- 🐋 **Real-time Monitoring**: Checks for whale trades every 5 minutes.
+- ⚙️ **Configurable Threshold**: Set your own whale amount (default: $10,000) directly from the app.
 - 🔔 **Desktop Notifications**: Get instant alerts for big moves.
 - 📊 **Clean UI**: Simple card-based feed, not a complex trading terminal.
 - 📅 **History**: View past whale transactions with dates in dd/mm/yyyy format.
@@ -22,7 +23,7 @@ PolyWhale sits quietly in your background and notifies you whenever a "whale" tr
 
 2. **Install:**
    ```bash
-   sudo dpkg -i polywhale_2.0.0_amd64.deb
+   sudo dpkg -i polywhale_2.1.0_amd64.deb
    ```
 
 3. **Fix dependencies (if needed):**
@@ -59,9 +60,16 @@ sudo dpkg -r polywhale
 
 ## 🔧 Configuration
 
+### Whale Threshold
+You can customize the whale transaction threshold directly from the app interface:
+1. Launch PolyWhale
+2. In the header, find the **"Whale Threshold ($)"** input
+3. Enter your desired amount (e.g., 5000 for $5,000 transactions)
+4. Click **"Update"**
+5. Your preference is automatically saved and persists across restarts
+
 *For source installations:*
-You can customize the application behavior by editing `config.py`:
-- **Whale Threshold**: Change the minimum amount for alerts (default: $10,000).
+You can also customize other settings by editing `config.py`:
 - **Polling Interval**: Change how often it checks for new trades (default: 5 minutes).
 
 ## ❓ Troubleshooting

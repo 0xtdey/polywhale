@@ -20,13 +20,14 @@ class Database:
         """Connect to database and initialize schema."""
         self.conn = sqlite3.connect(self.db_path, check_same_thread=False)
         self.conn.row_factory = sqlite3.Row  # Access columns by name
-        self.cursor = self.conn.cursor()
         self._create_tables()
         
     def _create_tables(self):
         """Create database tables if they don't exist."""
+        cursor = self.conn.cursor()
+        
         # Whale transactions table
-        self.cursor.execute('''
+        cursor.execute('''
             CREATE TABLE IF NOT EXISTS whale_transactions (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 tx_hash TEXT UNIQUE NOT NULL,
@@ -43,7 +44,7 @@ class Database:
         ''')
         
         # Settings table
-        self.cursor.execute('''
+        cursor.execute('''
             CREATE TABLE IF NOT EXISTS settings (
                 key TEXT PRIMARY KEY,
                 value TEXT NOT NULL
@@ -51,6 +52,7 @@ class Database:
         ''')
         
         self.conn.commit()
+        cursor.close()
         
     def insert_transaction(self, tx_data: Dict) -> bool:
         """
@@ -62,8 +64,9 @@ class Database:
         Returns:
             True if inserted, False if duplicate
         """
+        cursor = self.conn.cursor()
         try:
-            self.cursor.execute('''
+            cursor.execute('''
                 INSERT INTO whale_transactions (
                     tx_hash, amount, market_name, market_id, outcome,
                     side, trader_address, timestamp, details_json, created_at
@@ -85,6 +88,8 @@ class Database:
         except sqlite3.IntegrityError:
             # Duplicate tx_hash
             return False
+        finally:
+            cursor.close()
             
     def get_all_transactions(self, limit: Optional[int] = None) -> List[Dict]:
         """
@@ -96,35 +101,39 @@ class Database:
         Returns:
             List of transaction dictionaries
         """
-        query = '''
-            SELECT * FROM whale_transactions 
-            ORDER BY timestamp DESC
-        '''
-        if limit:
-            query += f' LIMIT {limit}'
+        cursor = self.conn.cursor()
+        try:
+            query = '''
+                SELECT * FROM whale_transactions 
+                ORDER BY timestamp DESC
+            '''
+            if limit:
+                query += f' LIMIT {limit}'
+                
+            cursor.execute(query)
+            rows = cursor.fetchall()
             
-        self.cursor.execute(query)
-        rows = self.cursor.fetchall()
-        
-        # Manually convert rows to dicts to ensure proper serialization
-        transactions = []
-        for row in rows:
-            tx = {
-                'id': row['id'],
-                'tx_hash': row['tx_hash'],
-                'amount': float(row['amount']) if row['amount'] else 0,
-                'market_name': row['market_name'],
-                'market_id': row['market_id'],
-                'outcome': row['outcome'],
-                'side': row['side'],
-                'trader_address': row['trader_address'],
-                'timestamp': int(row['timestamp']) if row['timestamp'] else 0,
-                'details_json': row['details_json'],
-                'created_at': int(row['created_at']) if row['created_at'] else 0
-            }
-            transactions.append(tx)
-            
-        return transactions
+            # Manually convert rows to dicts to ensure proper serialization
+            transactions = []
+            for row in rows:
+                tx = {
+                    'id': row['id'],
+                    'tx_hash': row['tx_hash'],
+                    'amount': float(row['amount']) if row['amount'] else 0,
+                    'market_name': row['market_name'],
+                    'market_id': row['market_id'],
+                    'outcome': row['outcome'],
+                    'side': row['side'],
+                    'trader_address': row['trader_address'],
+                    'timestamp': int(row['timestamp']) if row['timestamp'] else 0,
+                    'details_json': row['details_json'],
+                    'created_at': int(row['created_at']) if row['created_at'] else 0
+                }
+                transactions.append(tx)
+                
+            return transactions
+        finally:
+            cursor.close()
         
     def get_transaction_by_hash(self, tx_hash: str) -> Optional[Dict]:
         """
@@ -136,12 +145,16 @@ class Database:
         Returns:
             Transaction dictionary or None
         """
-        self.cursor.execute(
-            'SELECT * FROM whale_transactions WHERE tx_hash = ?',
-            (tx_hash,)
-        )
-        row = self.cursor.fetchone()
-        return dict(row) if row else None
+        cursor = self.conn.cursor()
+        try:
+            cursor.execute(
+                'SELECT * FROM whale_transactions WHERE tx_hash = ?',
+                (tx_hash,)
+            )
+            row = cursor.fetchone()
+            return dict(row) if row else None
+        finally:
+            cursor.close()
         
     def transaction_exists(self, tx_hash: str) -> bool:
         """
@@ -153,25 +166,37 @@ class Database:
         Returns:
             True if exists, False otherwise
         """
-        self.cursor.execute(
-            'SELECT 1 FROM whale_transactions WHERE tx_hash = ? LIMIT 1',
-            (tx_hash,)
-        )
-        return self.cursor.fetchone() is not None
+        cursor = self.conn.cursor()
+        try:
+            cursor.execute(
+                'SELECT 1 FROM whale_transactions WHERE tx_hash = ? LIMIT 1',
+                (tx_hash,)
+            )
+            return cursor.fetchone() is not None
+        finally:
+            cursor.close()
         
     def get_setting(self, key: str) -> Optional[str]:
         """Get a setting value."""
-        self.cursor.execute('SELECT value FROM settings WHERE key = ?', (key,))
-        row = self.cursor.fetchone()
-        return row['value'] if row else None
+        cursor = self.conn.cursor()
+        try:
+            cursor.execute('SELECT value FROM settings WHERE key = ?', (key,))
+            row = cursor.fetchone()
+            return row['value'] if row else None
+        finally:
+            cursor.close()
         
     def set_setting(self, key: str, value: str):
         """Set or update a setting value."""
-        self.cursor.execute('''
-            INSERT OR REPLACE INTO settings (key, value)
-            VALUES (?, ?)
-        ''', (key, value))
-        self.conn.commit()
+        cursor = self.conn.cursor()
+        try:
+            cursor.execute('''
+                INSERT OR REPLACE INTO settings (key, value)
+                VALUES (?, ?)
+            ''', (key, value))
+            self.conn.commit()
+        finally:
+            cursor.close()
         
     def get_last_fetch_time(self) -> Optional[int]:
         """Get the last time trades were fetched."""
@@ -184,8 +209,32 @@ class Database:
         
     def get_transaction_count(self) -> int:
         """Get total count of stored transactions."""
-        self.cursor.execute('SELECT COUNT(*) as count FROM whale_transactions')
-        return self.cursor.fetchone()['count']
+        cursor = self.conn.cursor()
+        try:
+            cursor.execute('SELECT COUNT(*) as count FROM whale_transactions')
+            return cursor.fetchone()['count']
+        finally:
+            cursor.close()
+        
+    def get_whale_threshold(self) -> float:
+        """Get the whale threshold from settings or return default."""
+        import config
+        cursor = self.conn.cursor()
+        try:
+            cursor.execute(
+                'SELECT value FROM settings WHERE key = ?',
+                ('whale_threshold',)
+            )
+            result = cursor.fetchone()
+            return float(result['value']) if result else config.WHALE_THRESHOLD
+        except Exception:
+            return config.WHALE_THRESHOLD
+        finally:
+            cursor.close()
+        
+    def set_whale_threshold(self, amount: float):
+        """Set the whale threshold."""
+        self.set_setting('whale_threshold', str(amount))
         
     def close(self):
         """Close database connection."""

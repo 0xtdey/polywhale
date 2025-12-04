@@ -20,7 +20,9 @@ class NotifierService:
             on_new_trade: Optional callback when new trade is found
         """
         self.db = Database()
-        self.api = PolymarketAPI()
+        # Don't connect here - will connect in start() to avoid cursor issues
+        self.api = None  # Will initialize in start() with proper threshold
+        
         self.scheduler = BackgroundScheduler()
         self.on_new_trade = on_new_trade
         self.is_running = False
@@ -38,6 +40,10 @@ class NotifierService:
         
         # Connect to database
         self.db.connect()
+        
+        # Initialize API with threshold from database
+        whale_threshold = self.db.get_whale_threshold()
+        self.api = PolymarketAPI(whale_threshold=whale_threshold)
         
         # Check if first run
         last_fetch = self.db.get_last_fetch_time()
@@ -155,6 +161,15 @@ class NotifierService:
         """Manually trigger a poll for new trades."""
         print("Manual poll triggered")
         self._poll_trades()
+        
+    def update_threshold(self, amount: float):
+        """Update the whale threshold dynamically.
+        
+        Args:
+            amount: New threshold amount
+        """
+        print(f"Updating whale threshold to ${amount:,.2f}")
+        self.api.whale_threshold = amount
         
     def stop(self):
         """Stop the background service."""

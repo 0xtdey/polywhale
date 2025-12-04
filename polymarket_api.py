@@ -10,12 +10,17 @@ import config
 class PolymarketAPI:
     """Client for interacting with Polymarket Data API."""
     
-    def __init__(self):
-        """Initialize API client."""
+    def __init__(self, whale_threshold: Optional[float] = None):
+        """Initialize API client.
+        
+        Args:
+            whale_threshold: Optional custom whale threshold (defaults to config value)
+        """
         self.base_url = config.POLYMARKET_API_BASE
         self.trades_endpoint = config.TRADES_ENDPOINT
         self.timeout = config.API_TIMEOUT
         self.max_retries = config.MAX_RETRIES
+        self.whale_threshold = whale_threshold if whale_threshold is not None else config.WHALE_THRESHOLD
         
     def fetch_trades(
         self,
@@ -36,7 +41,7 @@ class PolymarketAPI:
         """
         params = {
             'filterType': config.FILTER_TYPE,
-            'filterAmount': config.FILTER_AMOUNT,
+            'filterAmount': self.whale_threshold,
             'limit': limit,
             'sortBy': 'TIMESTAMP',
             'sortDirection': 'DESC'
