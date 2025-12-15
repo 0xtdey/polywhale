@@ -13,6 +13,9 @@
     "dev": "electron . --no-sandbox",
     "build": "electron-builder",
     "build:linux": "electron-builder --linux",
+    "build:win": "electron-builder --win",
+    "build:mac": "electron-builder --mac",
+    "build:all": "electron-builder --linux --win",
     "build:publish": "electron-builder --linux --publish always",
     "postinstall": "electron-builder install-app-deps"
   },
@@ -49,6 +52,26 @@
       "category": "Network",
       "icon": "build/icon.png"
     },
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "build/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "PolyWhale"
+    },
+    "mac": {
+      "target": [
+        "dmg"
+      ],
+      "icon": "build/icon.icns",
+      "category": "public.app-category.finance"
+    },
     "deb": {
       "depends": [
         "python3",
@@ -73,8 +96,8 @@
     ],
     "extraResources": [
       {
-        "from": "dist/backend_server",
-        "to": "backend_server"
+        "from": "dist/backend_server${ext}",
+        "to": "backend_server${ext}"
       },
       {
         "from": ".",

@@ -1,0 +1,146 @@
+name: Build & Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., 2.1.0)'
+        required: false
+        default: ''
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyinstaller
+
+      - name: Build Python backend
+        run: |
+          pyinstaller backend_server.py \
+            --name=backend_server \
+            --onefile \
+            --clean \
+            --add-data="config.py:." \
+            --add-data="database.py:." \
+            --add-data="polymarket_api.py:." \
+            --add-data="notifier_service.py:." \
+            --hidden-import=flask \
+            --hidden-import=flask_cors \
+            --hidden-import=requests \
+            --hidden-import=apscheduler \
+            --hidden-import=notify2 \
+            --hidden-import=dbus \
+            --log-level=WARN
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Build Electron app (Linux)
+        run: npm run build:linux
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Linux artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-builds
+          path: |
+            dist/*.deb
+            dist/*.AppImage
+
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-backend.txt
+          pip install pyinstaller
+
+      - name: Build Python backend
+        run: |
+          pyinstaller backend_server.py `
+            --name=backend_server `
+            --onefile `
+            --clean `
+            --add-data="config.py;." `
+            --add-data="database.py;." `
+            --add-data="polymarket_api.py;." `
+            --add-data="notifier_service.py;." `
+            --hidden-import=flask `
+            --hidden-import=flask_cors `
+            --hidden-import=requests `
+            --hidden-import=apscheduler `
+            --log-level=WARN
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Build Electron app (Windows)
+        run: npm run build:win
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Windows artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-builds
+          path: |
+            dist/*.exe
+
+  release:
+    needs: [build-linux, build-windows]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    permissions:
+      contents: write
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            artifacts/linux-builds/*
+            artifacts/windows-builds/*
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

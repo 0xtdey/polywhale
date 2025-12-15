@@ -17,10 +17,22 @@ PolyWhale sits quietly in your background and notifies you whenever a "whale" tr
 
 ## 📥 Download & Install
 
+### For Windows Users
+
+1. **Download the installer:**
+   - Get the latest `PolyWhale-Setup-x.x.x.exe` from the [Releases page](https://github.com/0xtdey/polywhale/releases).
+
+2. **Install:**
+   - Double-click the installer and follow the prompts.
+   - Choose your installation directory or use the default.
+
+3. **Launch:**
+   - Find **PolyWhale** in your Start Menu or on your Desktop.
+
 ### For Debian/Ubuntu Users
 
 1. **Download the .deb package:**
-   - Get the latest `polywhale_x.x.x_amd64.deb` from the [Releases page](https://github.com/YOUR_USERNAME/polywhale/releases).
+   - Get the latest `polywhale_x.x.x_amd64.deb` from the [Releases page](https://github.com/0xtdey/polywhale/releases).
 
 2. **Install:**
    ```bash
