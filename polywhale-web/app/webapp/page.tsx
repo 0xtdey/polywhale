@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from "react";
 import TransactionTable from "@/components/TransactionTable";
 import NotificationBanner from "@/components/NotificationBanner";
-import DownloadSection from "@/components/DownloadSection";
 import { StoredTransaction } from "@/lib/database";
 import { POLL_INTERVAL_SECONDS } from "@/lib/config";
 
@@ -213,8 +212,6 @@ export default function WebApp() {
                 </div>
                 <span>Last updated: {formatLastUpdate()}</span>
             </div>
-
-            <DownloadSection />
         </main>
     );
 }
