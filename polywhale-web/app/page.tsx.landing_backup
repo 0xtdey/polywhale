@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 
-// Static mock data for preview (uses fixed timestamps to avoid hydration mismatch)
+// Static mock data for preview (used on Vercel where backend is not available)
 interface MockTransaction {
     tx_hash: string;
     timestamp: number;
@@ -14,22 +14,19 @@ interface MockTransaction {
     outcome: string;
 }
 
-// Using fixed timestamps (will be formatted as relative times on client)
-const BASE_TIMESTAMP = 1734400000; // Fixed base timestamp
-
 const MOCK_TRANSACTIONS: MockTransaction[] = [
-    { tx_hash: "0x1a2b3c", timestamp: BASE_TIMESTAMP - 120, market_name: "Will Bitcoin exceed $100k by Dec 2024?", amount: 125000, side: "BUY", outcome: "Yes" },
-    { tx_hash: "0x2b3c4d", timestamp: BASE_TIMESTAMP - 300, market_name: "Trump wins 2024 election", amount: 89500, side: "SELL", outcome: "No" },
-    { tx_hash: "0x3c4d5e", timestamp: BASE_TIMESTAMP - 540, market_name: "Fed cuts rates in January 2025", amount: 67800, side: "BUY", outcome: "Yes" },
-    { tx_hash: "0x4d5e6f", timestamp: BASE_TIMESTAMP - 900, market_name: "ETH flips BTC market cap 2025", amount: 45200, side: "BUY", outcome: "Yes" },
-    { tx_hash: "0x5e6f7g", timestamp: BASE_TIMESTAMP - 1200, market_name: "SpaceX Starship successful landing", amount: 32100, side: "SELL", outcome: "No" },
-    { tx_hash: "0x6f7g8h", timestamp: BASE_TIMESTAMP - 1800, market_name: "Apple releases AR glasses 2025", amount: 28900, side: "BUY", outcome: "Yes" },
+    { tx_hash: "0x1a2b3c", timestamp: Math.floor(Date.now() / 1000) - 120, market_name: "Will Bitcoin exceed $100k by Dec 2024?", amount: 125000, side: "BUY", outcome: "Yes" },
+    { tx_hash: "0x2b3c4d", timestamp: Math.floor(Date.now() / 1000) - 300, market_name: "Trump wins 2024 election", amount: 89500, side: "SELL", outcome: "No" },
+    { tx_hash: "0x3c4d5e", timestamp: Math.floor(Date.now() / 1000) - 540, market_name: "Fed cuts rates in January 2025", amount: 67800, side: "BUY", outcome: "Yes" },
+    { tx_hash: "0x4d5e6f", timestamp: Math.floor(Date.now() / 1000) - 900, market_name: "ETH flips BTC market cap 2025", amount: 45200, side: "BUY", outcome: "Yes" },
+    { tx_hash: "0x5e6f7g", timestamp: Math.floor(Date.now() / 1000) - 1200, market_name: "SpaceX Starship successful landing", amount: 32100, side: "SELL", outcome: "No" },
+    { tx_hash: "0x6f7g8h", timestamp: Math.floor(Date.now() / 1000) - 1800, market_name: "Apple releases AR glasses 2025", amount: 28900, side: "BUY", outcome: "Yes" },
 ];
 
 export default function LandingPage() {
     const GITHUB_REPO = "https://github.com/0xtdey/polywhale";
     const GITHUB_RELEASES = "https://github.com/0xtdey/polywhale/releases/latest";
-    const WEB_APP_URL = "/webapp";
+    const WEB_APP_URL = "/";
 
     // State for preview animation
     const [isRefreshing, setIsRefreshing] = useState(false);

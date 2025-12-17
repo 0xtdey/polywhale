@@ -99,7 +99,7 @@ body {
 
 .threshold-control label {
   color: var(--text-secondary);
-  font-size: 0.9rem;
+  font-size: 1rem;
 }
 
 .threshold-control input {
@@ -109,7 +109,7 @@ body {
   border-radius: 5px;
   background-color: var(--bg-tertiary);
   color: var(--text-primary);
-  font-size: 0.9rem;
+  font-size: 1rem;
 }
 
 .threshold-control input:focus {
@@ -122,7 +122,7 @@ body {
   padding: 10px 20px;
   border: none;
   border-radius: 5px;
-  font-size: 0.9rem;
+  font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
   transition: background-color 0.2s ease, transform 0.1s ease;
@@ -170,6 +170,7 @@ body {
 .transactions-table {
   width: 100%;
   border-collapse: collapse;
+  font-size: 1.1rem;
 }
 
 .transactions-table th {
@@ -186,11 +187,13 @@ body {
 .transactions-table td {
   padding: 12px 15px;
   border-bottom: 1px solid var(--border-color);
+  vertical-align: middle;
 }
 
-.transactions-table tr:nth-child(even) {
+/* Zebra striping removed for uniform color */
+/* .transactions-table tr:nth-child(even) {
   background-color: #252525;
-}
+} */
 
 .transactions-table tr:hover {
   background-color: var(--bg-hover);
@@ -203,19 +206,39 @@ body {
 
 /* Amount styling */
 .amount {
-  color: var(--accent-green);
+  color: #fbbf24;
   font-weight: 700;
 }
 
-/* Side styling */
+/* Side styling - boxes like landing page */
 .side-buy {
-  color: var(--accent-blue);
-  font-weight: 600;
+  background: rgba(74, 222, 128, 0.15);
+  color: #4ade80;
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 8px 0;
+  border-radius: 6px;
+  display: inline-block;
+  text-align: center;
+  min-width: 80px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border: 1px solid rgba(74, 222, 128, 0.2);
 }
 
 .side-sell {
-  color: var(--accent-orange);
-  font-weight: 600;
+  background: rgba(248, 113, 113, 0.15);
+  color: #f87171;
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 8px 0;
+  border-radius: 6px;
+  display: inline-block;
+  text-align: center;
+  min-width: 80px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border: 1px solid rgba(248, 113, 113, 0.2);
 }
 
 /* Market name - truncate long names */

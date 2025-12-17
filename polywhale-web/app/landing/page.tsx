@@ -2,19 +2,39 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useEffect, useCallback } from "react";
-import { StoredTransaction } from "@/lib/database";
+import { useState } from "react";
+
+// Static mock data for preview (uses fixed timestamps to avoid hydration mismatch)
+interface MockTransaction {
+    tx_hash: string;
+    timestamp: number;
+    market_name: string;
+    amount: number;
+    side: "BUY" | "SELL";
+    outcome: string;
+}
+
+// Using fixed timestamps (will be formatted as relative times on client)
+const BASE_TIMESTAMP = 1734400000; // Fixed base timestamp
+
+const MOCK_TRANSACTIONS: MockTransaction[] = [
+    { tx_hash: "0x1a2b3c", timestamp: BASE_TIMESTAMP - 120, market_name: "Will Bitcoin exceed $100k by Dec 2024?", amount: 125000, side: "BUY", outcome: "Yes" },
+    { tx_hash: "0x2b3c4d", timestamp: BASE_TIMESTAMP - 300, market_name: "Trump wins 2024 election", amount: 89500, side: "SELL", outcome: "No" },
+    { tx_hash: "0x3c4d5e", timestamp: BASE_TIMESTAMP - 540, market_name: "Fed cuts rates in January 2025", amount: 67800, side: "BUY", outcome: "Yes" },
+    { tx_hash: "0x4d5e6f", timestamp: BASE_TIMESTAMP - 900, market_name: "ETH flips BTC market cap 2025", amount: 45200, side: "BUY", outcome: "Yes" },
+    { tx_hash: "0x5e6f7g", timestamp: BASE_TIMESTAMP - 1200, market_name: "SpaceX Starship successful landing", amount: 32100, side: "SELL", outcome: "No" },
+    { tx_hash: "0x6f7g8h", timestamp: BASE_TIMESTAMP - 1800, market_name: "Apple releases AR glasses 2025", amount: 28900, side: "BUY", outcome: "Yes" },
+];
 
 export default function LandingPage() {
     const GITHUB_REPO = "https://github.com/0xtdey/polywhale";
     const GITHUB_RELEASES = "https://github.com/0xtdey/polywhale/releases/latest";
-    const WEB_APP_URL = "/";
-    const REFRESH_INTERVAL = 5000; // 5 seconds
+    const WEB_APP_URL = "/webapp";
 
-    // State for live transactions
-    const [transactions, setTransactions] = useState<StoredTransaction[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
+    // State for preview animation
     const [isRefreshing, setIsRefreshing] = useState(false);
+    const [transactions] = useState<MockTransaction[]>(MOCK_TRANSACTIONS);
+    const isLoading = false;
 
     // Format timestamp
     const formatTime = (timestamp: number): string => {
@@ -36,40 +56,12 @@ export default function LandingPage() {
         })}`;
     };
 
-    // Fetch transactions from API
-    const fetchTransactions = useCallback(async () => {
-        try {
-            const response = await fetch("/api/transactions?limit=6");
-            const data = await response.json();
-            if (data.success) {
-                setTransactions(data.transactions);
-            }
-        } catch (error) {
-            console.error("Error fetching transactions:", error);
-        } finally {
-            setIsLoading(false);
-        }
-    }, []);
-
-    // Manual refresh
+    // Simulated refresh animation for the preview
     const handleRefresh = async () => {
         setIsRefreshing(true);
-        try {
-            await fetch("/api/refresh", { method: "POST" });
-            await fetchTransactions();
-        } catch (error) {
-            console.error("Error refreshing:", error);
-        } finally {
-            setIsRefreshing(false);
-        }
+        // Just a visual effect - no actual API call
+        setTimeout(() => setIsRefreshing(false), 800);
     };
-
-    // Initial fetch and auto-refresh
-    useEffect(() => {
-        fetchTransactions();
-        const interval = setInterval(fetchTransactions, REFRESH_INTERVAL);
-        return () => clearInterval(interval);
-    }, [fetchTransactions]);
 
     return (
         <div className="landing-page">

@@ -90,16 +90,18 @@ export default function TransactionTable({
                                 <td>{formatTimestamp(tx.timestamp)}</td>
                                 <td className="market-name">{tx.market_name || "Unknown"}</td>
                                 <td className="amount">{formatAmount(tx.amount)}</td>
-                                <td
-                                    className={
-                                        tx.side === "BUY"
-                                            ? "side-buy"
-                                            : tx.side === "SELL"
-                                                ? "side-sell"
-                                                : ""
-                                    }
-                                >
-                                    {tx.side || "N/A"}
+                                <td>
+                                    <span
+                                        className={
+                                            tx.side === "BUY"
+                                                ? "side-buy"
+                                                : tx.side === "SELL"
+                                                    ? "side-sell"
+                                                    : ""
+                                        }
+                                    >
+                                        {tx.side || "N/A"}
+                                    </span>
                                 </td>
                                 <td>{tx.outcome || "N/A"}</td>
                             </tr>
